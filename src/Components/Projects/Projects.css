@@ -1,0 +1,70 @@
+.projects-heading {
+    align-items: center;
+    border-bottom: 1px solid #DFE3E8;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    width: "100%";
+}
+
+.project-space {
+    width: 100%;
+    height: 480px;
+    overflow: auto;
+    padding: 20px;
+    background-color: #FAFAFA;
+}
+
+.project-dropdown {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    cursor: pointer;
+    user-select: none;
+    padding: 20px;
+    border-bottom: 1px solid #E0E3E7;
+}
+
+.project-category {
+    padding: 20px;
+    border-bottom: 1px solid #E0E3E7;
+}
+
+.project-container {
+    width: 100%;
+    padding: 10px 10px 10px 30px;
+}
+
+.polaris-icon {
+    margin: 0 8px 0 0;
+    transition: transform 0.2s ease;
+}
+
+.project-title-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.add-contributors {
+     color: rgb(89, 103, 195);
+     font-weight: 600;
+     display: flex;
+     width: 130px;
+     align-items: center;
+     justify-content: space-between;
+}
+
+.project-description {
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.bottom-bar {
+    height: 20px;
+    color: white;
+    height: 55px;
+    padding: 12px;
+    padding-left: 20px;
+}

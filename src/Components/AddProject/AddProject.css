@@ -1,0 +1,10 @@
+.text-field-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-bottom: 1px solid #E0E3E7;
+}
+
+.text-field-container h3 {
+    margin-bottom: 10px;
+}

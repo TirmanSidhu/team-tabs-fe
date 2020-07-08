@@ -4,10 +4,13 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+import enTranslations from '@shopify/polaris/locales/en.json';
+import {AppProvider, Page, Card, Button} from '@shopify/polaris';
+
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <AppProvider i18n={enTranslations}>
+    <App/>
+  </AppProvider>,
   document.getElementById('root')
 );
 
