@@ -1,5 +1,5 @@
 /*global chrome*/
-import React, {useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
 import {
     DropdownMinor,
@@ -20,8 +20,9 @@ import * as helpers from '../../helpers.js';
       var allProjects;
       var currentProjectsArray = [];
       var allProjectsArray = [];
-      chrome.identity.getProfileUserInfo(async function(userinfo){
-      await chrome.runtime.sendMessage({type: 'queryCollectionWithWhere', opts: {collection: 'users', where: ['email', '==', userinfo.email]}}, function(response) {
+
+    chrome.identity.getProfileUserInfo(function(userinfo){
+        chrome.runtime.sendMessage({type: 'queryCollectionWithWhere', opts: {collection: 'users', where: ['email', '==', userinfo.email]}}, function(response) {
           if(response !== null) {
             user = JSON.parse(response);
           }
@@ -146,86 +147,39 @@ function Projects(props) {
             }
         };
 
-    var projects = getProjects();
-    console.log("rendering")
-    console.log(projects);
-    const [allProjects, setAllProjects ] = useState({
-            all: [
-            {
-                project_id: 'project_1',
-                project_name: 'Store Performance',
-                members: 12,
-                project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-            },
-            {
-                project_id: 'project_2',
-                project_name: 'Shop Lab',
-                members: 11,
-                project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-            }
-        ],
-        current: projects[1]
-    })
+        useEffect( () => {
+            var projects = getProjects();
+            console.log(projects);
+            setAllProjects({
+                current: projects[1],
+                all: projects[0]
+            })
+        }, [])
 
+        
+        console.log("rendering")
+        const [allProjects, setAllProjects ] = useState({
+            current: [],
+            all: [],
+        });
 
-
-    return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <div className="projects-heading">
-                <Heading>Projects</Heading>
-            </div>
-            <div className="project-space">
-                <Card>
-                    <div className="project-category">
-                        <TextStyle variation="strong">Current</TextStyle >
-                    </div>
-                    <Droppable droppableId="current">
-                        {(provided, snapshot) => (
-                            <div className="project-container" ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
-                                {allProjects.current.map((project, i) => (
-                                    <Draggable
-                                        key={project.project_id}
-                                        draggableId={project.project_id}
-                                        index={i}
-                                    >
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={getItemStyle(
-                                                    snapshot.isDragging,
-                                                    provided.draggableProps.style
-                                                )}>
-                                                   <ProjectBrief name={project.project_name} description={project.project_description} id={project.project_id} members={project.members} />
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </Card>
-                <Card>
-                    <div onClick={handleAllToggle} className="project-dropdown">
-                        <div className="polaris-icon" style={all ? {} : {transform: 'rotate(-180deg)'}}>
-                            <Icon source={DropdownMinor}/>
+        return (
+            <DragDropContext onDragEnd={onDragEnd}>
+                <div className="projects-heading">
+                    <Heading>Projects</Heading>
+                </div>
+                <div className="project-space">
+                    <Card>
+                        <div className="project-category">
+                            <TextStyle variation="strong">Current</TextStyle >
                         </div>
-                        <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
-                    </div>
-                    <Collapsible
-                        open={all}
-                        id="basic-collapsible"
-                        transition={{duration: '150ms', timingFunction: 'ease'}}
-                    >
-                        <Droppable droppableId="all">
+                        <Droppable droppableId="current">
                             {(provided, snapshot) => (
                                 <div className="project-container" ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
-                                    {allProjects.all.map((project, i) => (
+                                    {allProjects.current.map((project, i) => (
                                         <Draggable
-                                            key={project.project_id}
-                                            draggableId={project.project_id}
+                                            key={project.id}
+                                            draggableId={project.id}
                                             index={i}
                                         >
                                             {(provided, snapshot) => (
@@ -236,9 +190,8 @@ function Projects(props) {
                                                     style={getItemStyle(
                                                         snapshot.isDragging,
                                                         provided.draggableProps.style
-                                                    )}
-                                                >
-                                                   <ProjectBrief name={project.project_name} description={project.project_description} teamId={project.project_id} members={project.members} />
+                                                    )}>
+                                                       <ProjectBrief name={project.project_name} description={project.description} id={project.id} members={project.user_ids.length} />
                                                 </div>
                                             )}
                                         </Draggable>
@@ -247,16 +200,57 @@ function Projects(props) {
                                 </div>
                             )}
                         </Droppable>
-                    </Collapsible>
-                </Card>
-            </div>
-            <div className="bottom-bar">
-                <Link to="/add-project" style={{ textDecoration: 'none' }}>
-                    <Button size="slim" primary>Make a project</Button>
-                </Link>
-            </div>
-        </DragDropContext>
-    );
+                    </Card>
+                    <Card>
+                        <div onClick={handleAllToggle} className="project-dropdown">
+                            <div className="polaris-icon" style={all ? {} : {transform: 'rotate(-180deg)'}}>
+                                <Icon source={DropdownMinor}/>
+                            </div>
+                            <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
+                        </div>
+                        <Collapsible
+                            open={all}
+                            id="basic-collapsible"
+                            transition={{duration: '150ms', timingFunction: 'ease'}}
+                        >
+                            <Droppable droppableId="all">
+                                {(provided, snapshot) => (
+                                    <div className="project-container" ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
+                                        {allProjects.all.map((project, i) => (
+                                            <Draggable
+                                                key={project.id}
+                                                draggableId={project.id}
+                                                index={i}
+                                            >
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        style={getItemStyle(
+                                                            snapshot.isDragging,
+                                                            provided.draggableProps.style
+                                                        )}
+                                                    >
+                                                       <ProjectBrief name={project.project_name} description={project.description} teamId={project.id} members={project.members} />
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </Collapsible>
+                    </Card>
+                </div>
+                <div className="bottom-bar">
+                    <Link to="/add-project" style={{ textDecoration: 'none' }}>
+                        <Button size="slim" primary>Make a project</Button>
+                    </Link>
+                </div>
+            </DragDropContext>
+        );
 }
 
 export default Projects;
