@@ -168,10 +168,10 @@ function Projects(props) {
                 </Card>
                 <Card>
                     <div onClick={handleAllToggle} className="project-dropdown">
+                        <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
                         <div className="polaris-icon" style={all ? {} : {transform: 'rotate(-180deg)'}}>
                             <Icon source={DropdownMinor}/>
                         </div>
-                        <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
                     </div>
                     <Collapsible
                         open={all}

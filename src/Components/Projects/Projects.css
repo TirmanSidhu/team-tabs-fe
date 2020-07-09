@@ -37,7 +37,7 @@
 }
 
 .polaris-icon {
-    margin: 0 8px 0 0;
+    margin: 0 0 0 8px;
     transition: transform 0.2s ease;
 }
 
@@ -62,9 +62,12 @@
 }
 
 .bottom-bar {
-    height: 20px;
+    width: 230px;
     color: white;
     height: 55px;
     padding: 12px;
     padding-left: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }

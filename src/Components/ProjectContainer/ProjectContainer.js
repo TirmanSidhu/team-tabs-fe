@@ -1,5 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
+import {Page, Card, Button, Heading, Icon, Popover, TextField, FormLayout} from '@shopify/polaris';
 import {
     DropdownMinor,
     ChevronDownMinor,
@@ -17,24 +17,53 @@ function ProjectContainer(props) {
 
         //fetch from props.location.id
 
+        const [popoverActive, setPopoverActive] = useState(false);
+        const [headingValue, setheadingValue] = useState('');
+
+        const togglePopoverActive = useCallback(
+            () => setPopoverActive((popoverActive) => !popoverActive),
+            [],
+          );
+
+          const handleHeadingChange = useCallback((value) => setheadingValue(value), []);
+
+
+        function searchTree(element, matchingTitle){
+            if(element.title == matchingTitle){
+                 return element;
+            }else if (element.children != null){
+                 var i;
+                 var result = null;
+                 for(i=0; result == null && i < element.children.length; i++){
+                      result = searchTree(element.children[i], matchingTitle);
+                 }
+                 return result;
+            }
+            return null;
+       }
+
+        const activator = (
+            <Button size="slim" onClick={togglePopoverActive} primary>Add heading</Button>    
+        );
+
         const [projectStructure, setProjectStructure ] = useState([
             {
                 type: 'heading',
                 title: 'Inventory Research',
                 children: [
                     {
+                        type: 'file',
+                        title: "This is a link title1"
+                    },
+                    {
                         type: 'heading',
-                        title: 'Inventory Research',
+                        title: 'rough Research',
                         children: [ 
                             {
                                 type: 'file',
                                 title: "This is a link title"
                             }
                         ] 
-                    },
-                    {
-                        type: 'file',
-                        title: "This is a link title1"
                     },
                     {
                         type: 'file',
@@ -48,11 +77,11 @@ function ProjectContainer(props) {
             },
             {
                 type: 'heading',
-                title: 'Inventory Research',
+                title: 'second heading',
                 children: [
                     {
                         type: 'heading',
-                        title: 'Inventory Research',
+                        title: 'secondary Research',
                         children: [ 
                             {
                                 type: 'file',
@@ -74,7 +103,31 @@ function ProjectContainer(props) {
                     }
                 ]
             },
-        ])
+        ]);
+
+        const addTopLevelHeading = () => {
+            setProjectStructure(prevState => {
+                return ([...prevState, 
+                    {
+                        type: 'heading',
+                        title: headingValue,
+                        children: [ 
+                        ] 
+                    }
+                ])
+            })
+            setheadingValue('');
+            togglePopoverActive();
+        }
+
+        const deleteTopLevelHeading = (title) => {
+            setProjectStructure(projectStructure.filter(folder => folder.title !== title))
+        }
+
+        const deleteLastLevelHeading = (title) => {
+            setProjectStructure(projectStructure.filter(folder => folder.title !== title))
+        }
+
 
     return (
         <div>
@@ -92,12 +145,12 @@ function ProjectContainer(props) {
                 <Card>
                     {projectStructure.map(folder => {
                         return (
-                            <Folder title={folder.title}>
+                            <Folder title={folder.title} deleteTopLevelHeading={deleteTopLevelHeading}>
                                 {
                                     folder.children.map(item => {
                                         if(item.type === 'heading') {
                                             return (
-                                                <Folder title={folder.title} lastLevel>
+                                                <Folder title={item.title} lastLevel>
                                                     {
                                                         item.children.map(file => <File title={file.title} link="shopify.com"/>)
                                                     }
@@ -114,9 +167,22 @@ function ProjectContainer(props) {
                 </Card>
             </div>
             <div className="bottom-bar">
-                <Link to="/add-project" style={{ textDecoration: 'none' }}>
-                    <Button size="slim" primary>Add a heading</Button>            
-                </Link>
+                <Popover
+                    active={popoverActive}
+                    activator={activator}
+                    onClose={togglePopoverActive}
+                    ariaHaspopup={false}
+                    sectioned
+                >
+                    <FormLayout>
+                    <TextField
+                        label="Heading"
+                        value={headingValue}
+                        onChange={handleHeadingChange}
+                    />
+                    <Button size="slim" onClick={addTopLevelHeading} >Add Heading</Button>
+                    </FormLayout>
+                </Popover>       
             </div>
         </div>
     );

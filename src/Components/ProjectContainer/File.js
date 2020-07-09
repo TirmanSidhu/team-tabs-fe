@@ -28,7 +28,7 @@ export default function Folder(props) {
 
     return (
         <div className="file">
-            <div style={{padding: '0px'}}>
+            <div className="popover">
                 <Popover
                     active={popoverActive}
                     activator={activator}
@@ -47,7 +47,6 @@ export default function Folder(props) {
                     />
                 </Popover>
             </div>
-
             <div className="file-link">
                 <Link url={props.link}>{props.title}</Link>
             </div>

@@ -12,10 +12,17 @@ import './AddProject.css';
 
 function AddProject() {
 
-    const [textFieldValue, setTextFieldValue] = useState('Jaded Pixel');
+    const [name, setname] = useState('');
 
-    const handleTextFieldChange = useCallback(
-      (value) => setTextFieldValue(value),
+    const nameChange = useCallback(
+      (value) => setname(value),
+      [],
+    );
+
+    const [description, setdescription] = useState('');
+
+    const descriptionChange = useCallback(
+      (value) => setdescription(value),
       [],
     );
 
@@ -39,8 +46,8 @@ function AddProject() {
                             <TextStyle variation="strong">Name</TextStyle>
                         </h3>
                         <TextField
-                            value={textFieldValue}
-                            onChange={handleTextFieldChange}
+                            value={name}
+                            onChange={nameChange}
                             maxLength={20}
                             showCharacterCount
                         />
@@ -50,8 +57,8 @@ function AddProject() {
                             <TextStyle variation="strong">Description</TextStyle>
                         </h3>
                         <TextField
-                            value={textFieldValue}
-                            onChange={handleTextFieldChange}
+                            value={description}
+                            onChange={descriptionChange}
                             maxLength={120}
                             showCharacterCount
                             multiline={3}
