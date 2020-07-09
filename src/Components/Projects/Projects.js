@@ -1,5 +1,5 @@
 /*global chrome*/
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useLayoutEffect, useState, useCallback} from 'react';
 import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
 import {
     DropdownMinor,
@@ -146,22 +146,23 @@ function Projects(props) {
                 setAllProjects(result);
             }
         };
-
-        useEffect( () => {
-            var projects = getProjects();
-            console.log(projects);
-            setAllProjects({
-                current: projects[1],
-                all: projects[0]
-            })
-        }, [])
-
         
         console.log("rendering")
         const [allProjects, setAllProjects ] = useState({
             current: [],
             all: [],
         });
+
+        useLayoutEffect( () => {
+            var projects = getProjects();
+            console.log(projects);
+            setAllProjects({
+                current: projects[1],
+                all: projects[0]
+            })
+            console.log(allProjects);
+        }, [])
+
 
         return (
             <DragDropContext onDragEnd={onDragEnd}>
@@ -232,7 +233,7 @@ function Projects(props) {
                                                             provided.draggableProps.style
                                                         )}
                                                     >
-                                                       <ProjectBrief name={project.project_name} description={project.description} teamId={project.id} members={project.members} />
+                                                       <ProjectBrief name={project.project_name} description={project.description} teamId={project.id} members={project.user_ids.length} />
                                                     </div>
                                                 )}
                                             </Draggable>
