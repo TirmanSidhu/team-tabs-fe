@@ -1,12 +1,12 @@
-import React, {useState, useCallback} from 'react';
-import {Page, Card, Button, Heading, Icon, Stack, TextStyle, ResourceItem, Avatar, TextField} from '@shopify/polaris';
+import React, { useState, useCallback } from 'react';
+import { Page, Card, Button, Heading, Icon, Stack, TextStyle, ResourceItem, Avatar, TextField } from '@shopify/polaris';
 import {
     DropdownMinor,
     ChevronLeftMinor,
     CustomerPlusMajorMonotone,
     LinkMinor,
     MobileCancelMajorMonotone
-  } from "@shopify/polaris-icons";
+} from "@shopify/polaris-icons";
 import { Link } from "react-router-dom";
 import './AddProject.css';
 
@@ -15,9 +15,29 @@ function AddProject() {
     const [textFieldValue, setTextFieldValue] = useState('Jaded Pixel');
 
     const handleTextFieldChange = useCallback(
-      (value) => setTextFieldValue(value),
-      [],
+        (value) => setTextFieldValue(value),
+        [],
     );
+
+    const currentUserId = 'aoA2AfS5key5e4skHS9Z';
+    function createProject(project_name, description, emoji_name, user_ids, vault_url) {
+        var projectData = {
+            current: false,
+            project_name: project_name,
+            description: description,
+            emoji_name: emoji_name,
+            group_ids: [],
+            user_ids: user_ids,
+            vault_url: vault_url
+        }
+        console.log('calling create function')
+        chrome.runtime.sendMessage({ type: 'addWithRandomID', opts: { collection: 'project', data: projectData } }, function (response) {
+            if (response.status == 'success') {
+                console.log('project added: ', response.docRefId)
+                alert('project added successfully');
+            }
+        });
+    }
 
     return (
         <div className="add-project">
@@ -60,8 +80,8 @@ function AddProject() {
                 </Card>
                 <Card>
                     <div className="share-link">
-                        <div className="polaris-icon" style={{width: '18px'}}>
-                            <Icon source={LinkMinor}/>
+                        <div className="polaris-icon" style={{ width: '18px' }}>
+                            <Icon source={LinkMinor} />
                         </div>
                         <TextStyle variation="strong">Shareable Link to Join</TextStyle>
                     </div>
@@ -70,13 +90,22 @@ function AddProject() {
                             https://tabify.com/834638
                         </div>
                         <div>
-                            <Button size="slim" primary>Copy</Button> 
+                            <Button size="slim" primary>Copy</Button>
                         </div>
                     </div>
                 </Card>
             </div>
             <div className="bottom-bar">
-                <Button primary size="slim">Make Project</Button>            
+                <Button primary size="slim" onClick={
+                    createProject(
+                        'CREATING PROJECT ON REACT',
+                        'Testing add project function',
+                        'open_file_folder',
+                        [currentUserId],
+                        'https://vault.shopify.io/projects/10600')
+                }>
+                    Make Project
+                </Button>
             </div>
         </div>
     );
