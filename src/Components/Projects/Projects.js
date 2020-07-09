@@ -13,14 +13,14 @@ import './Projects.css';
 import ProjectBrief from './ProjectBrief';
 
 
-    const getProjects = async () => {
+    const getProjects = () => {
       var user;
       var currentProjects;
       var allProjects;
       var currentProjectsArray = [];
       var allProjectsArray = [];
-      await chrome.identity.getProfileUserInfo(function(userinfo){
-        chrome.runtime.sendMessage({type: 'queryCollectionWithWhere', opts: {collection: 'users', where: ['email', '==', userinfo.email]}}, function(response) {
+      chrome.identity.getProfileUserInfo(async function(userinfo){
+      await chrome.runtime.sendMessage({type: 'queryCollectionWithWhere', opts: {collection: 'users', where: ['email', '==', userinfo.email]}}, function(response) {
           if(response !== null) {
             user = JSON.parse(response);
           }
@@ -145,8 +145,7 @@ function Projects(props) {
             }
         };
 
-    var projects = [{},{}];
-    projects = getProjects();
+    var projects = getProjects();
     console.log("rendering")
     console.log(projects);
     const [allProjects, setAllProjects ] = useState({
