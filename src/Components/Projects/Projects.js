@@ -1,5 +1,6 @@
+/*global chrome*/
 import React, {useState, useCallback} from 'react';
-import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible, Popover, TextField, FormLayout} from '@shopify/polaris';
+import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
 import {
     DropdownMinor,
     ChevronDownMinor,
@@ -10,6 +11,47 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Link } from "react-router-dom";
 import './Projects.css';
 import ProjectBrief from './ProjectBrief';
+
+
+    const getProjects = () => {
+      var user;
+      var currentProjects;
+      var allProjects;
+      var currentProjectsArray = [];
+      var allProjectsArray = [];
+      chrome.identity.getProfileUserInfo(async function(userinfo){
+      await chrome.runtime.sendMessage({type: 'queryCollectionWithWhere', opts: {collection: 'users', where: ['email', '==', userinfo.email]}}, function(response) {
+          if(response !== null) {
+            user = JSON.parse(response);
+          }
+
+          currentProjects = user.current_projects;
+          allProjects = user.all_projects;
+          currentProjects.forEach(function(entry) {
+            console.log(entry);
+            chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
+              if(response !== null) {
+                console.log("retrieved project");
+                console.log(JSON.parse(response));
+                currentProjectsArray.push(JSON.parse(response));
+              }
+            });
+          });
+
+          allProjects.forEach(function(entry) {
+            console.log(entry);
+            chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
+              if(response !== null) {
+                console.log("retrieved project");
+                console.log(JSON.parse(response));
+                allProjectsArray.push(JSON.parse(response));
+              }
+            });
+          });
+        });
+      });
+      return [currentProjectsArray, allProjectsArray];
+    }
 
     const getItemStyle = (isDragging, draggableStyle) => ({
         // some basic styles to make the items look a bit nicer
@@ -58,21 +100,12 @@ function Projects(props) {
         const [all, setAll] = useState(true);
         const handleAllToggle = useCallback(() => setAll((all) => !all), []);
 
-        const [popoverActive, setPopoverActive] = useState(false);
-        const [linkValue, setLinkValue] = useState('');
-        const handleLinkChange = useCallback((value) => setLinkValue(value), []);
-
-        const togglePopoverActive = useCallback(
-            () => setPopoverActive((popoverActive) => !popoverActive),
-            [],
-          );
+        const closeExtension = () => {}
 
         const id2List = {
             current: 'current',
             all: 'all'
         };
-
-        let currentUserId = 'aoA2AfS5key5e4skHS9Z';
 
         const getList = id => allProjects[id2List[id]];
 
@@ -112,6 +145,9 @@ function Projects(props) {
             }
         };
 
+    var projects = getProjects();
+    console.log("rendering")
+    console.log(projects);
     const [allProjects, setAllProjects ] = useState({
             all: [
             {
@@ -127,34 +163,10 @@ function Projects(props) {
                 project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
             }
         ],
-        current: [
-            {
-                project_id: 'project_0',
-                project_name: 'Inventory States',
-                project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-                members: 13,
-            }
-        ]
+        current: projects[1]
     })
 
-    const addCurrentProject = () => {
-        setAllProjects(prevState => {
-            return ({...prevState,
-                current: [...prevState.current,
-                    {
-                        project_id: 'project_4',
-                        project_name: 'Store Data',
-                        members: 5,
-                        project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-                    }
-                ]
-            })
-        })
-        setLinkValue('');
-        togglePopoverActive();
-    }
 
-    const joinProject = (<Button size="slim" onClick={setPopoverActive} primary>Join a project</Button>);
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
@@ -196,10 +208,10 @@ function Projects(props) {
                 </Card>
                 <Card>
                     <div onClick={handleAllToggle} className="project-dropdown">
-                        <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
                         <div className="polaris-icon" style={all ? {} : {transform: 'rotate(-180deg)'}}>
                             <Icon source={DropdownMinor}/>
                         </div>
+                        <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
                     </div>
                     <Collapsible
                         open={all}
@@ -241,22 +253,6 @@ function Projects(props) {
                 <Link to="/add-project" style={{ textDecoration: 'none' }}>
                     <Button size="slim" primary>Make a project</Button>
                 </Link>
-                <Popover
-                    active={popoverActive}
-                    activator={joinProject}
-                    onClose={togglePopoverActive}
-                    ariaHaspopup={false}
-                    sectioned
-                >
-                    <FormLayout>
-                    <TextField
-                        label="Project Link"
-                        value={linkValue}
-                        onChange={handleLinkChange}
-                    />
-                    <Button size="slim" onClick={addCurrentProject} >Add Heading</Button>
-                    </FormLayout>
-                </Popover>
             </div>
         </DragDropContext>
     );
