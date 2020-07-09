@@ -11,6 +11,19 @@ import { Link } from "react-router-dom";
 import Folder from './Folder';
 import File from './File';
 import './ProjectContainer.css';
+import {
+    createProject,
+    updateProject,
+    createGroupInProject,
+    createGroupInGroup,
+    createFileInGroup,
+    deleteUserFromProject,
+    createUserInProject,
+    deleteGroupFromGroup,
+    deleteGroupFromProject,
+    deleteFileFromGroup,
+} from '../../helpers.js'
+
 
 
 function ProjectContainer(props) {
@@ -121,10 +134,6 @@ function ProjectContainer(props) {
         }
 
         const deleteTopLevelHeading = (title) => {
-            setProjectStructure(projectStructure.filter(folder => folder.title !== title))
-        }
-
-        const deleteLastLevelHeading = (title) => {
             setProjectStructure(projectStructure.filter(folder => folder.title !== title))
         }
 
