@@ -1,5 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
+import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible, Popover, TextField, FormLayout} from '@shopify/polaris';
 import {
     DropdownMinor,
     ChevronDownMinor,
@@ -58,7 +58,14 @@ function Projects(props) {
         const [all, setAll] = useState(true);
         const handleAllToggle = useCallback(() => setAll((all) => !all), []);
 
-        const closeExtension = () => {}
+        const [popoverActive, setPopoverActive] = useState(false);
+        const [linkValue, setLinkValue] = useState('');
+        const handleLinkChange = useCallback((value) => setLinkValue(value), []);
+        
+        const togglePopoverActive = useCallback(
+            () => setPopoverActive((popoverActive) => !popoverActive),
+            [],
+          );
 
         const id2List = {
             current: 'current',
@@ -127,6 +134,25 @@ function Projects(props) {
             }
         ]
     })
+
+    const addCurrentProject = () => {
+        setAllProjects(prevState => {
+            return ({...prevState, 
+                current: [...prevState.current, 
+                    {
+                        project_id: 'project_4',
+                        project_name: 'Store Data',
+                        members: 5,
+                        project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
+                    }
+                ]
+            })
+        })
+        setLinkValue('');
+        togglePopoverActive();
+    }
+
+    const joinProject = (<Button size="slim" onClick={setPopoverActive} primary>Join a project</Button>);
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
@@ -213,6 +239,22 @@ function Projects(props) {
                 <Link to="/add-project" style={{ textDecoration: 'none' }}>
                     <Button size="slim" primary>Make a project</Button>            
                 </Link>
+                <Popover
+                    active={popoverActive}
+                    activator={joinProject}
+                    onClose={togglePopoverActive}
+                    ariaHaspopup={false}
+                    sectioned
+                >
+                    <FormLayout>
+                    <TextField
+                        label="Project Link"
+                        value={linkValue}
+                        onChange={handleLinkChange}
+                    />
+                    <Button size="slim" onClick={addCurrentProject} >Add Heading</Button>
+                    </FormLayout>
+                </Popover>   
             </div>
         </DragDropContext>
     );
