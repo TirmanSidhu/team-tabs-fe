@@ -50,7 +50,7 @@ export function getUserById(id) {
             console.log('user found: ', response.docRefId)
             return JSON.parse(response)
         } else {
-            console.log('user not found by ID')
+            console.log('user not found by ID', response)
         }
     });
 }
