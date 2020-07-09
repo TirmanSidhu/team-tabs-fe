@@ -7,9 +7,14 @@ import {
     LinkMinor,
     MobileCancelMajorMonotone
   } from "@shopify/polaris-icons";
+import { Link } from "react-router-dom";
 import './Teams.css';
 
-function Teams() {
+function Teams(props) {
+
+    //use this to fetch team data
+    console.log(props.location.teamId)
+
 
     const people = [
         {
@@ -38,11 +43,13 @@ function Teams() {
         <div className="teams">
             <div className="teams-heading">
                 <Heading>Share with contributors</Heading>
-                <Button
-                    accessibilityLabel="Cancel"
-                    icon={MobileCancelMajorMonotone}
-                    plain
-                />
+                <Link to="/" style={{ textDecoration: 'none' }}>
+                    <Button
+                        accessibilityLabel="Cancel"
+                        icon={MobileCancelMajorMonotone}
+                        plain
+                    />
+                </Link>
             </div>
             <div className="team-space">
                 <Card>

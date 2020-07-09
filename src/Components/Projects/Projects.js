@@ -7,7 +7,9 @@ import {
     MobileCancelMajorMonotone
   } from "@shopify/polaris-icons";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Link } from "react-router-dom";
 import './Projects.css';
+import ProjectBrief from './ProjectBrief';
 
     const getItemStyle = (isDragging, draggableStyle) => ({
         // some basic styles to make the items look a bit nicer
@@ -130,12 +132,6 @@ function Projects(props) {
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="projects-heading">
                 <Heading>Projects</Heading>
-                <Button
-                    accessibilityLabel="Cancel"
-                    icon={MobileCancelMajorMonotone}
-                    onClick={closeExtension}
-                    plain
-                />
             </div>
             <div className="project-space">
                 <Card>
@@ -160,18 +156,7 @@ function Projects(props) {
                                                     snapshot.isDragging,
                                                     provided.draggableProps.style
                                                 )}>
-                                                    <div className="project-title-bar">
-                                                        <TextStyle variation="strong">{project.project_name}</TextStyle >
-                                                        <div className="add-contributors" onClick={() => {}}>
-                                                            {`${project.members} contributors`}
-                                                            <div style={{width: '16px'}}>
-                                                                <Icon source={CustomerPlusMajorMonotone} color="indigo"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <p className="project-description">
-                                                        {project.project_description}
-                                                    </p>
+                                                   <ProjectBrief name={project.project_name} description={project.project_description} id={project.project_id} members={project.members} />
                                             </div>
                                         )}
                                     </Draggable>
@@ -186,7 +171,7 @@ function Projects(props) {
                         <div className="polaris-icon" style={all ? {} : {transform: 'rotate(-180deg)'}}>
                             <Icon source={DropdownMinor}/>
                         </div>
-                        <TextStyle variation="strong">{`All (${2})`}</TextStyle >
+                        <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
                     </div>
                     <Collapsible
                         open={all}
@@ -212,18 +197,7 @@ function Projects(props) {
                                                         provided.draggableProps.style
                                                     )}
                                                 >
-                                                    <div className="project-title-bar">
-                                                        <TextStyle variation="strong">{project.project_name}</TextStyle >
-                                                        <div className="add-contributors" onClick={() => {}}>
-                                                            {`${project.members} contributors`}
-                                                            <div style={{width: '16px'}}>
-                                                                <Icon source={CustomerPlusMajorMonotone} color="indigo"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <p className="project-description">
-                                                        {project.project_description}
-                                                    </p>
+                                                   <ProjectBrief name={project.project_name} description={project.project_description} teamId={project.project_id} members={project.members} />
                                                 </div>
                                             )}
                                         </Draggable>
@@ -232,12 +206,13 @@ function Projects(props) {
                                 </div>
                             )}
                         </Droppable>
-                        
                     </Collapsible>
                 </Card>
             </div>
             <div className="bottom-bar">
-                <Button size="slim" primary>Make a project</Button>            
+                <Link to="/add-project" style={{ textDecoration: 'none' }}>
+                    <Button size="slim" primary>Make a project</Button>            
+                </Link>
             </div>
         </DragDropContext>
     );

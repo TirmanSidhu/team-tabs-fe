@@ -7,6 +7,7 @@ import {
     LinkMinor,
     MobileCancelMajorMonotone
   } from "@shopify/polaris-icons";
+import { Link } from "react-router-dom";
 import './AddProject.css';
 
 function AddProject() {
@@ -22,11 +23,14 @@ function AddProject() {
         <div className="add-project">
             <div className="teams-heading">
                 <Heading>Add a project</Heading>
-                <Button
-                    accessibilityLabel="Cancel"
-                    icon={MobileCancelMajorMonotone}
-                    plain
-                />
+                <Link to="/" style={{ textDecoration: 'none' }}>
+                    <Button
+                        accessibilityLabel="Cancel"
+                        icon={MobileCancelMajorMonotone}
+                        plain
+                    />
+                </Link>
+
             </div>
             <div className="team-space">
                 <Card>

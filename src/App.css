@@ -2,7 +2,10 @@
   background-color: white;
   width: 400px;
   height: 600px;
-  margin: 100px;
-  position: fixed;
-  right: 200px;
+}
+
+html,
+body {
+  min-width: 400px;
+  min-height: 600px;
 }
