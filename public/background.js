@@ -54,9 +54,18 @@ database.collection("users").get().then((querySnapshot) => {
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
   switch (msg.type) {
     case 'addWithRandomID':
-      database.collection(msg.opts.collection).add(msg.opts.data);
+      database.collection(msg.opts.collection).add(msg.opts.data).then(function(docRef) {
+        response({status: 'success', docRefId: docRef.id})
+      });
+      break;
+    case 'editWithID':
+      database.collection(msg.opts.collection).doc(msg.opts.id).update(msg.opts.data);
       response('success');
       break;
+    case 'updateDocumentListField':
+      database.collection(msg.opts.collection).doc(msg.opts.id).update({
+        [msg.opts.field]: firebase.firestore.FieldValue.arrayUnion(msg.opts.data) 
+      });
     case 'queryCollectionWithID':
       var document = database.collection(msg.opts.collection).doc(msg.opts.id);
       document.get().then(function(doc) {

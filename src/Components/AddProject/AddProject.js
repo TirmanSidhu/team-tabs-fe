@@ -9,6 +9,7 @@ import {
 } from "@shopify/polaris-icons";
 import { Link } from "react-router-dom";
 import './AddProject.css';
+/*global chrome*/
 
 function AddProject() {
 
