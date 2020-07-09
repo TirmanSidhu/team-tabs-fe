@@ -136,6 +136,12 @@ function ProjectContainer(props) {
         const deleteTopLevelHeading = (title) => {
             setProjectStructure(projectStructure.filter(folder => folder.title !== title))
         }
+        
+        const deleteFile = (title) => {
+            setProjectStructure(projectStructure.map(folder => {
+                folder.children.filter(child => child.title !== title)
+            }))
+        }
 
 
     return (
