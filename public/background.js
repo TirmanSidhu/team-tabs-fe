@@ -24,24 +24,6 @@ var config = {
 const app = firebase.initializeApp(config);
 const database = app.firestore();
 
-//Firestore documentation: https://firebase.google.com/docs/firestore/manage-data/add-data
-// database.collection("users").add({
-//     first: "Alan",
-//     middle: "Mathison",
-//     last: "Turing",
-//     born: 1912
-// })
-
-database.collection("users").doc("bobby.nguyen@shopify.com").set({
-  password: "test"
-})
-.then(function() {
-    console.log("Document successfully written!");
-})
-.catch(function(error) {
-    console.error("Error writing document: ", error);
-});
-
 database.collection("users").get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
         console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
@@ -54,8 +36,23 @@ database.collection("users").get().then((querySnapshot) => {
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
   switch (msg.type) {
     case 'addWithRandomID':
-      database.collection(msg.opts.collection).add(msg.opts.data);
+      database.collection(msg.opts.collection).add(msg.opts.data).then(function(docRef) {
+        response({status: 'success', docRefId: docRef.id})
+      });
+      break;
+    case 'editWithID':
+      database.collection(msg.opts.collection).doc(msg.opts.id).update(msg.opts.data);
       response('success');
+      break;
+    case 'updateDocumentListField':
+      database.collection(msg.opts.collection).doc(msg.opts.id).update({
+        [msg.opts.field]: firebase.firestore.FieldValue.arrayUnion(msg.opts.data) 
+      });
+      break;
+    case 'removeDocumentListField':
+      database.collection(msg.opts.collection).doc(msg.opts.id).update({
+        [msg.opts.field]: firebase.firestore.FieldValue.arrayRemove(msg.opts.data) 
+      });
       break;
     case 'queryCollectionWithID':
       var document = database.collection(msg.opts.collection).doc(msg.opts.id);
@@ -87,7 +84,14 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
       } else {
         response('invalid number of where params, expected 3')
       }
-    break;
+      break;
+    case 'deleteDocWithId':
+      database.collection(msg.opts.collection).doc(msg.opts.id).delete().then(function() {
+        console.log("Document successfully deleted!");
+      }).catch(function(error) {
+        console.error("Error removing document: ", error);
+      });
+      break;
     default:
       response('unknown request');
       break;
