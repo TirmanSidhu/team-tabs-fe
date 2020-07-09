@@ -1,3 +1,4 @@
+/*global chrome*/
 import React, {useState, useCallback} from 'react';
 import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
 import {
@@ -11,19 +12,60 @@ import { Link } from "react-router-dom";
 import './Projects.css';
 import ProjectBrief from './ProjectBrief';
 
+
+    const getProjects = async () => {
+      var user;
+      var currentProjects;
+      var allProjects;
+      var currentProjectsArray = [];
+      var allProjectsArray = [];
+      await chrome.identity.getProfileUserInfo(function(userinfo){
+        chrome.runtime.sendMessage({type: 'queryCollectionWithWhere', opts: {collection: 'users', where: ['email', '==', userinfo.email]}}, function(response) {
+          if(response !== null) {
+            user = JSON.parse(response);
+          }
+
+          currentProjects = user.current_projects;
+          allProjects = user.all_projects;
+          currentProjects.forEach(function(entry) {
+            console.log(entry);
+            chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
+              if(response !== null) {
+                console.log("retrieved project");
+                console.log(JSON.parse(response));
+                currentProjectsArray.push(JSON.parse(response));
+              }
+            });
+          });
+
+          allProjects.forEach(function(entry) {
+            console.log(entry);
+            chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
+              if(response !== null) {
+                console.log("retrieved project");
+                console.log(JSON.parse(response));
+                allProjectsArray.push(JSON.parse(response));
+              }
+            });
+          });
+        });
+      });
+      return [currentProjectsArray, allProjectsArray];
+    }
+
     const getItemStyle = (isDragging, draggableStyle) => ({
         // some basic styles to make the items look a bit nicer
         userSelect: "none",
-    
+
         // change background colour if dragging
         boxShadow: isDragging ? "0px 0px 4px 4px rgba(89,103,195,0.38)" : "",
         background: isDragging ? '#F4F6F8' : "",
         padding: 10,
-    
+
         // styles we need to apply on draggables
         ...draggableStyle
     });
-    
+
     const getListStyle = isDraggingOver => ({
         background: isDraggingOver ? "rgba(89, 103, 195, 0.1)" : "",
     });
@@ -66,7 +108,7 @@ function Projects(props) {
         };
 
         const getList = id => allProjects[id2List[id]];
-        
+
         const onDragEnd = result => {
             const { source, destination } = result;
 
@@ -103,6 +145,10 @@ function Projects(props) {
             }
         };
 
+    var projects = [{},{}];
+    projects = getProjects();
+    console.log("rendering")
+    console.log(projects);
     const [allProjects, setAllProjects ] = useState({
             all: [
             {
@@ -118,15 +164,10 @@ function Projects(props) {
                 project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
             }
         ],
-        current: [
-            {
-                project_id: 'project_0',
-                project_name: 'Inventory States',
-                project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-                members: 13,
-            }
-        ]
+        current: projects[1]
     })
+
+
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
@@ -211,7 +252,7 @@ function Projects(props) {
             </div>
             <div className="bottom-bar">
                 <Link to="/add-project" style={{ textDecoration: 'none' }}>
-                    <Button size="slim" primary>Make a project</Button>            
+                    <Button size="slim" primary>Make a project</Button>
                 </Link>
             </div>
         </DragDropContext>

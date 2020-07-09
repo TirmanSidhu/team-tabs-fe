@@ -48,6 +48,11 @@ database.collection("users").get().then((querySnapshot) => {
     });
 });
 
+//get current user email
+chrome.identity.getProfileUserInfo(function(userinfo){
+  chrome.storage.local.set({email: userinfo.email});
+});
+
 //In order to access the Firebase DB through other js files, the following listeners
 //are initalized below.
 
@@ -64,7 +69,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
       break;
     case 'updateDocumentListField':
       database.collection(msg.opts.collection).doc(msg.opts.id).update({
-        [msg.opts.field]: firebase.firestore.FieldValue.arrayUnion(msg.opts.data) 
+        [msg.opts.field]: firebase.firestore.FieldValue.arrayUnion(msg.opts.data)
       });
     case 'queryCollectionWithID':
       var document = database.collection(msg.opts.collection).doc(msg.opts.id);
