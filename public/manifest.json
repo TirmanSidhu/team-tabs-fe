@@ -4,6 +4,10 @@
   "version": "1.0.1",
   "author": "young team",
   "manifest_version": 2,
+  "background": {
+    "page": "background.html",
+    "persistent": true
+  },
   "icons": {
     "16": "16.png",
     "48": "48.png"
@@ -12,6 +16,6 @@
     "default_popup": "index.html",
     "default_title": "Team Tabs"
   },
-  "content_security_policy": "script-src 'self' 'sha256-WDhufSqZOEoWULzS4Nwz11MNyHzZClVYbQ2JSt1vfkw'; object-src 'self'",
-  "permissions": []
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com 'sha256-WDhufSqZOEoWULzS4Nwz11MNyHzZClVYbQ2JSt1vfkw'; object-src 'self'; connect-src 'self' wss://*.firebaseio.com https://firestore.googleapis.com/;",
+  "permissions": ["activeTab", "declarativeContent", "storage"]
 }
