@@ -1,60 +1,7 @@
 'use strict';
+/*global chrome*/
 
 let currentUserId = 'aoA2AfS5key5e4skHS9Z';
-
-addProject.onclick = function() {
-    createProject(
-        'Test Create Project',
-        'Testing add project function',
-        'open_file_folder',
-        [currentUserId],
-        'https://vault.shopify.io/projects/10600'
-    )
-}
-
-editProject.onclick = function() {
-    updateProject(
-        'NK8xmSYgZd1Y08KEha7k',
-        'Test Edit Project',
-        'Testing edit project function',
-        null,
-        null,
-    )
-}
-
-addGroupToProject.onclick = function(){
-    createGroupInProject(
-        'vUr7CaXyQZIHaLmGor4R', //project_id
-        'open_file_folder', 
-        'testing create group'
-    )
-}
-
-addGroupToGroup.onclick = function(){
-    createGroupInGroup(
-        'vUr7CaXyQZIHaLmGor4R', //project_id
-        'fCLFmRIYHIH0MMVrRyGj', // group_id
-        'open_file_folder', 
-        'testing create group in group'
-    )
-}
-
-addFileToGroup.onclick = function(){
-    createFileInGroup(
-        'zU2AANmGlQDekZfoTUGJ', //group_id
-        'DELETE THIS ONE', 
-        'testing create file in group',
-        'https://console.firebase.google.com/project/probable-signal-282616/database/firestore/data~2Fgroup~2FzU2AANmGlQDekZfoTUGJ'
-    )
-}
-
-removeFileFromGroup.onclick = function(){
-    deleteFileFromGroup(
-        '04fNErfG22PQjlVHSN4L',
-        'zU2AANmGlQDekZfoTUGJ' //group_id
-    )
-}
-
 
 export function createProject(project_name, description, emoji_name, user_ids, vault_url){
     var projectData = {
@@ -78,21 +25,32 @@ export function updateProject(project_id, project_name, description, emoji_name,
     var updateProjectData = {}
     if (project_name != null){
         updateProjectData.project_name = project_name
-    } 
+    }
     if (description != null){
         updateProjectData.description = description
-    } 
+    }
     if (emoji_name != null){
         updateProjectData.emoji_name = emoji_name
-    } 
+    }
     if (vault_url != null){
         updateProjectData.vault_url = vault_url
-    } 
+    }
 
     chrome.runtime.sendMessage({type: 'editWithID', opts: {collection: 'project', id: project_id, data: updateProjectData}}, function(response){
         if (response == 'success'){
             console.log('projected edited')
             alert('project edited successfully');
+        }
+    });
+}
+
+export function getUserById(id) {
+    chrome.runtime.sendMessage({type: 'queryCollectionWithID', opts: {collection: 'users', id: id}}, function(response) {
+        if (response.status == 'success'){
+            console.log('user found: ', response.docRefId)
+            return JSON.parse(response)
+        } else {
+            console.log('user not found by ID')
         }
     });
 }
@@ -113,11 +71,11 @@ export function createGroupInProject(project_id, emoji_name, group_name){
 
             // adds generated group_id to project group_ids list
             chrome.runtime.sendMessage({type: 'updateDocumentListField', opts: {collection: 'project', id: project_id, field: 'group_ids', data: response.docRefId}})
-        } 
+        }
     });
 }
 
-// same as function as above, but for groups 
+// same as function as above, but for groups
 export function createGroupInGroup(project_id, group_id, emoji_name, group_name){
     var groupData = {
         project_id: project_id,
@@ -134,7 +92,7 @@ export function createGroupInGroup(project_id, group_id, emoji_name, group_name)
 
             // adds generated group_id to group group_ids list
             chrome.runtime.sendMessage({type: 'updateDocumentListField', opts: {collection: 'group', id: group_id, field: 'group_ids', data: response.docRefId}})
-        } 
+        }
     });
 }
 
@@ -173,7 +131,7 @@ export function createUserInProject(userId, projectId){
   chrome.runtime.sendMessage({type: 'updateDocumentListField', opts: {collection: 'users', id: userId, field: 'project_ids', data: projectId}})
 }
 
-export function deleteGroupFromGroup(child_group_id, parent_group_id){
+export function deleteGroupFromGroup(child_group_id, parent_group_id, project_id){
     // delete child_group object itself
     chrome.runtime.sendMessage({type: 'deleteDocWithId', opts: {collection:'group', id: child_group_id}})
 
