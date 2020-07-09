@@ -24,6 +24,8 @@ import {
     deleteFileFromGroup,
 } from '../../helpers.js'
 
+import logo from '../64.png';
+
 
 
 function ProjectContainer(props) {
@@ -66,53 +68,56 @@ function ProjectContainer(props) {
                 children: [
                     {
                         type: 'file',
-                        title: "This is a link title1"
+                        title: "Google's research link",
+                        parentTitle: 'Inventory Research'
                     },
                     {
                         type: 'heading',
-                        title: 'rough Research',
+                        title: 'Rough research',
                         children: [ 
                             {
                                 type: 'file',
-                                title: "This is a link title"
+                                title: "UXR research"
                             }
                         ] 
                     },
                     {
                         type: 'file',
-                        title: "This is a link title2"
+                        title: "Data on inventory",
+                        parentTitle: 'Inventory Research'
                     },
                     {
                         type: 'file',
-                        title: "This is a link title3"
+                        title: "Previous Inventory Project",
+                        parentTitle: 'Inventory Research'
                     }
                 ]
             },
             {
                 type: 'heading',
-                title: 'second heading',
+                title: 'Front-end links',
                 children: [
                     {
                         type: 'heading',
-                        title: 'secondary Research',
+                        title: 'Ux dev research',
                         children: [ 
                             {
                                 type: 'file',
-                                title: "This is a link title"
+                                title: "Prototyping sandbox"
                             }
                         ] 
                     },
                     {
                         type: 'file',
-                        title: "This is a link title1"
+                        title: "Css tricks"
                     },
                     {
                         type: 'file',
-                        title: "This is a link title2"
+                        title: "Doc of components used"
                     },
                     {
                         type: 'file',
-                        title: "This is a link title3"
+                        title: "New polaris link"
                     }
                 ]
             },
@@ -136,6 +141,30 @@ function ProjectContainer(props) {
         const deleteTopLevelHeading = (title) => {
             setProjectStructure(projectStructure.filter(folder => folder.title !== title))
         }
+        
+        // const deleteFile = (title) => {
+        //     setProjectStructure(projectStructure.map(folder => {
+        //         folder.children.filter(child => child.title !== title)
+        //     }))
+        // }
+
+        const addTopLevelLink = (title, folderTitle) => {
+            setProjectStructure(prevState => {
+                const newState = prevState.map( folder => {
+                    if(folderTitle == folder.title) {
+                        folder.children.push({
+                            type: 'file',
+                            title: title
+                        })
+                        return folder;
+                    } else {
+                        return folder;
+                    }
+                })
+                console.log(newState);
+                return newState;
+            })
+        }
 
 
     return (
@@ -154,7 +183,7 @@ function ProjectContainer(props) {
                 <Card>
                     {projectStructure.map(folder => {
                         return (
-                            <Folder title={folder.title} deleteTopLevelHeading={deleteTopLevelHeading}>
+                            <Folder title={folder.title} deleteTopLevelHeading={deleteTopLevelHeading} addTopLevelLink={addTopLevelLink}>
                                 {
                                     folder.children.map(item => {
                                         if(item.type === 'heading') {
@@ -191,7 +220,8 @@ function ProjectContainer(props) {
                     />
                     <Button size="slim" onClick={addTopLevelHeading} >Add Heading</Button>
                     </FormLayout>
-                </Popover>       
+                </Popover>
+                <img className="logo" src={logo}/>    
             </div>
         </div>
     );

@@ -10,6 +10,7 @@ import {
 import { Link } from "react-router-dom";
 import './AddProject.css';
 import * as Helpers from '../../helpers.js'
+import logo from '../64.png';
 
 function AddProject() {
 
@@ -90,6 +91,7 @@ function AddProject() {
             </div>
             <div className="bottom-bar">
                 <Button primary onClick={makeProject} size="slim">Make Project</Button>
+                <img className="logo" src={logo}/>    
             </div>
         </div>
     );

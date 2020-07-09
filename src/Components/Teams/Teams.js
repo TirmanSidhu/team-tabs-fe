@@ -9,6 +9,7 @@ import {
   } from "@shopify/polaris-icons";
 import { Link } from "react-router-dom";
 import './Teams.css';
+import logo from '../64.png';
 
 function Teams(props) {
 
@@ -96,7 +97,8 @@ function Teams(props) {
                 </Card>
             </div>
             <div className="bottom-bar">
-                <Button primary size="slim">Leave Project</Button>            
+                <Button primary size="slim">Leave Project</Button> 
+                <img className="logo" src={logo}/>              
             </div>
         </div>
     );

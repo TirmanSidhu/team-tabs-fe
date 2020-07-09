@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import './Projects.css';
 import ProjectBrief from './ProjectBrief';
 import * as helpers from '../../helpers.js';
+import logo from '../64.png';
 
 
     const getProjects = () => {
@@ -147,31 +148,48 @@ function Projects(props) {
             }
         };
         
-        console.log("rendering")
+        // console.log("rendering")
         const [allProjects, setAllProjects ] = useState({
-            current: [],
-            all: [],
+            current: [
+                {
+                    name: "Inventory States - Committed",
+                    description: 'Merchants can use this to reduce costs & max profits.',
+                    id: 'project_0',
+                    members: 12,
+                },
+                {
+                    name: 'Inventory Accuracy Context Research',
+                    description: 'Context-gathering research to understand the inventory tracking space.',
+                    id: 'project_1',
+                    members: 8,
+                }
+            ],
+            all: [
+                {
+                    name: '[Sonic] Performance Lab Test',
+                    description: 'Allow partners to run a simulation to test the performance of development stores and managed stores.',
+                    id: 'project_2',
+                    members: 6,
+                },
+                {
+                    name: 'Hack Days!',
+                    description: 'Shared Bookmarks Chrome Extension for Hack Days 28!',
+                    id: 'project_3',
+                    members: 7,
+                }
+            ],
         });
 
-        useLayoutEffect( () => {
-            var projects = getProjects();
-            console.log(projects);
-            setAllProjects({
-                current: projects[1],
-                all: projects[0]
-            })
-            console.log(allProjects);
-        }, [])
+        // useLayoutEffect( () => {
+        //     var projects = getProjects();
+        //     console.log(projects);
+        //     setAllProjects({
+        //         current: projects[1],
+        //         all: projects[0]
+        //     })
+        //     console.log(allProjects);
+        // }, [])
 
-<<<<<<< HEAD
-=======
-
-        console.log("rendering")
-        const [allProjects, setAllProjects ] = useState({
-            current: [],
-            all: [],
-        });
->>>>>>> 34baa1954b78382dc6277aac4b95038cd2936fe3
 
         return (
             <DragDropContext onDragEnd={onDragEnd}>
@@ -201,7 +219,7 @@ function Projects(props) {
                                                         snapshot.isDragging,
                                                         provided.draggableProps.style
                                                     )}>
-                                                       <ProjectBrief name={project.project_name} description={project.description} id={project.id} members={project.user_ids.length} />
+                                                       <ProjectBrief name={project.name} description={project.description} id={project.id} members={project.members} />
                                                 </div>
                                             )}
                                         </Draggable>
@@ -242,7 +260,7 @@ function Projects(props) {
                                                             provided.draggableProps.style
                                                         )}
                                                     >
-                                                       <ProjectBrief name={project.project_name} description={project.description} teamId={project.id} members={project.user_ids.length} />
+                                                       <ProjectBrief name={project.name} description={project.description} teamId={project.id} members={project.members} />
                                                     </div>
                                                 )}
                                             </Draggable>
@@ -258,6 +276,7 @@ function Projects(props) {
                     <Link to="/add-project" style={{ textDecoration: 'none' }}>
                         <Button size="slim" primary>Make a project</Button>
                     </Link>
+                    <img className="logo" src={logo}/>    
                 </div>
             </DragDropContext>
         );

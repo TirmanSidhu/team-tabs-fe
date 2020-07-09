@@ -51,7 +51,11 @@ export default function Folder(props) {
             }
             toggleFolderPop();
         }
-
+        const addLink = () => {
+            console.log(title, props.title)
+            props.addTopLevelLink(title, props.title);
+            toggleFilePop(); 
+        }
         const fileButton = (
             <Button
                 accessibilityLabel="file"
@@ -87,27 +91,29 @@ export default function Folder(props) {
                     <Icon source={DropdownMinor}/>
                 </div>
                 <div className="folder-buttons">
-                    <Popover
-                        active={filePop}
-                        activator={fileButton}
-                        onClose={toggleFilePop}
-                        ariaHaspopup={false}
-                        sectioned
-                    >
-                        <FormLayout>
-                            <TextField
-                                label="Title"
-                                value={title}
-                                onChange={handleTitleChange}
-                            />
-                            <TextField
-                                label="URL"
-                                value={url}
-                                onChange={handleURLChange}
-                            />
-                            <Button size="slim" onClick={addFile}>Add Link</Button>
-                        </FormLayout>
-                    </Popover>
+                    <div onClick={e => e.stopPropagation()}>
+                        <Popover
+                            active={filePop}
+                            activator={fileButton}
+                            onClose={toggleFilePop}
+                            ariaHaspopup={false}
+                            sectioned
+                        >
+                            <FormLayout>
+                                <TextField
+                                    label="Title"
+                                    value={title}
+                                    onChange={handleTitleChange}
+                                />
+                                <TextField
+                                    label="URL"
+                                    value={url}
+                                    onChange={handleURLChange}
+                                />
+                                <Button size="slim" onClick={addLink}>Add Link</Button>
+                            </FormLayout>
+                        </Popover>
+                    </div>
                     <div style={props.lastLevel ? {display: 'none'} : {}}>
                         <Popover
                             active={folderPop}

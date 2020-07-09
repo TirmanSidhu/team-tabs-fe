@@ -12,6 +12,7 @@ import './ProjectContainer.css';
 export default function Folder(props) {
 
     const [popoverActive, setPopoverActive] = useState(false);
+    const [deleted, setDeleted] = useState(false);
     const togglePopoverActive = useCallback(
         () => setPopoverActive((popoverActive) => !popoverActive),
         [],
@@ -27,7 +28,7 @@ export default function Folder(props) {
     );
 
     return (
-        <div className="file">
+        <div className="file" style={deleted ? {display: 'none'} : {}}>
             <div className="popover">
                 <Popover
                     active={popoverActive}
@@ -42,6 +43,7 @@ export default function Folder(props) {
                             destructive: true,
                             content: 'Delete',
                             icon: DeleteMinor,
+                            onAction: () => {setDeleted(true); togglePopoverActive()}
                             },
                         ]}
                     />
