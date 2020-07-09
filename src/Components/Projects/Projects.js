@@ -14,16 +14,16 @@ import ProjectBrief from './ProjectBrief';
     const getItemStyle = (isDragging, draggableStyle) => ({
         // some basic styles to make the items look a bit nicer
         userSelect: "none",
-    
+
         // change background colour if dragging
         boxShadow: isDragging ? "0px 0px 4px 4px rgba(89,103,195,0.38)" : "",
         background: isDragging ? '#F4F6F8' : "",
         padding: 10,
-    
+
         // styles we need to apply on draggables
         ...draggableStyle
     });
-    
+
     const getListStyle = isDraggingOver => ({
         background: isDraggingOver ? "rgba(89, 103, 195, 0.1)" : "",
     });
@@ -61,7 +61,7 @@ function Projects(props) {
         const [popoverActive, setPopoverActive] = useState(false);
         const [linkValue, setLinkValue] = useState('');
         const handleLinkChange = useCallback((value) => setLinkValue(value), []);
-        
+
         const togglePopoverActive = useCallback(
             () => setPopoverActive((popoverActive) => !popoverActive),
             [],
@@ -72,8 +72,10 @@ function Projects(props) {
             all: 'all'
         };
 
+        let currentUserId = 'aoA2AfS5key5e4skHS9Z';
+
         const getList = id => allProjects[id2List[id]];
-        
+
         const onDragEnd = result => {
             const { source, destination } = result;
 
@@ -137,8 +139,8 @@ function Projects(props) {
 
     const addCurrentProject = () => {
         setAllProjects(prevState => {
-            return ({...prevState, 
-                current: [...prevState.current, 
+            return ({...prevState,
+                current: [...prevState.current,
                     {
                         project_id: 'project_4',
                         project_name: 'Store Data',
@@ -237,7 +239,7 @@ function Projects(props) {
             </div>
             <div className="bottom-bar">
                 <Link to="/add-project" style={{ textDecoration: 'none' }}>
-                    <Button size="slim" primary>Make a project</Button>            
+                    <Button size="slim" primary>Make a project</Button>
                 </Link>
                 <Popover
                     active={popoverActive}
@@ -254,7 +256,7 @@ function Projects(props) {
                     />
                     <Button size="slim" onClick={addCurrentProject} >Add Heading</Button>
                     </FormLayout>
-                </Popover>   
+                </Popover>
             </div>
         </DragDropContext>
     );

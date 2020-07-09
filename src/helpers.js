@@ -2,61 +2,7 @@
 
 let currentUserId = 'aoA2AfS5key5e4skHS9Z';
 
-addProject.onclick = function() {
-    createProject(
-        'Test Create Project',
-        'Testing add project function',
-        'open_file_folder',
-        [currentUserId],
-        'https://vault.shopify.io/projects/10600'
-    )
-}
-
-editProject.onclick = function() {
-    updateProject(
-        'NK8xmSYgZd1Y08KEha7k',
-        'Test Edit Project',
-        'Testing edit project function',
-        null,
-        null,
-    )
-}
-
-addGroupToProject.onclick = function(){
-    createGroupInProject(
-        'vUr7CaXyQZIHaLmGor4R', //project_id
-        'open_file_folder', 
-        'testing create group'
-    )
-}
-
-addGroupToGroup.onclick = function(){
-    createGroupInGroup(
-        'vUr7CaXyQZIHaLmGor4R', //project_id
-        'fCLFmRIYHIH0MMVrRyGj', // group_id
-        'open_file_folder', 
-        'testing create group in group'
-    )
-}
-
-addFileToGroup.onclick = function(){
-    createFileInGroup(
-        'zU2AANmGlQDekZfoTUGJ', //group_id
-        'DELETE THIS ONE', 
-        'testing create file in group',
-        'https://console.firebase.google.com/project/probable-signal-282616/database/firestore/data~2Fgroup~2FzU2AANmGlQDekZfoTUGJ'
-    )
-}
-
-removeFileFromGroup.onclick = function(){
-    deleteFileFromGroup(
-        '04fNErfG22PQjlVHSN4L',
-        'zU2AANmGlQDekZfoTUGJ' //group_id
-    )
-}
-
-
-function createProject(project_name, description, emoji_name, user_ids, vault_url){
+export function createProject(project_name, description, emoji_name, user_ids, vault_url){
     var projectData = {
         current: false,
         project_name: project_name,
@@ -74,20 +20,20 @@ function createProject(project_name, description, emoji_name, user_ids, vault_ur
     });
 }
 
-function updateProject(project_id, project_name, description, emoji_name, vault_url){
+export function updateProject(project_id, project_name, description, emoji_name, vault_url){
     var updateProjectData = {}
     if (project_name != null){
         updateProjectData.project_name = project_name
-    } 
+    }
     if (description != null){
         updateProjectData.description = description
-    } 
+    }
     if (emoji_name != null){
         updateProjectData.emoji_name = emoji_name
-    } 
+    }
     if (vault_url != null){
         updateProjectData.vault_url = vault_url
-    } 
+    }
 
     chrome.runtime.sendMessage({type: 'editWithID', opts: {collection: 'project', id: project_id, data: updateProjectData}}, function(response){
         if (response == 'success'){
@@ -97,7 +43,7 @@ function updateProject(project_id, project_name, description, emoji_name, vault_
     });
 }
 
-function createGroupInProject(project_id, emoji_name, group_name){
+export function createGroupInProject(project_id, emoji_name, group_name){
     var groupData = {
         project_id: project_id,
         emoji_name: emoji_name,
@@ -113,12 +59,12 @@ function createGroupInProject(project_id, emoji_name, group_name){
 
             // adds generated group_id to project group_ids list
             chrome.runtime.sendMessage({type: 'updateDocumentListField', opts: {collection: 'project', id: project_id, field: 'group_ids', data: response.docRefId}})
-        } 
+        }
     });
 }
 
-// same as function as above, but for groups 
-function createGroupInGroup(project_id, group_id, emoji_name, group_name){
+// same as function as above, but for groups
+export function createGroupInGroup(project_id, group_id, emoji_name, group_name){
     var groupData = {
         project_id: project_id,
         emoji_name: emoji_name,
@@ -134,11 +80,11 @@ function createGroupInGroup(project_id, group_id, emoji_name, group_name){
 
             // adds generated group_id to group group_ids list
             chrome.runtime.sendMessage({type: 'updateDocumentListField', opts: {collection: 'group', id: group_id, field: 'group_ids', data: response.docRefId}})
-        } 
+        }
     });
 }
 
-function createFileInGroup(group_id, emoji_name, file_name, url){
+export function createFileInGroup(group_id, emoji_name, file_name, url){
     var fileData = {
         emoji_name: emoji_name,
         file_name: file_name,
@@ -157,7 +103,7 @@ function createFileInGroup(group_id, emoji_name, file_name, url){
     });
 }
 
-function deleteUserFromProject(userId, projectId){
+export function deleteUserFromProject(userId, projectId){
     // remove user_id from project
     chrome.runtime.sendMessage({type: 'removeDocumentListField', opts: {collection: 'project', id: projectId, field: 'user_ids', data: userId}})
 
@@ -165,7 +111,7 @@ function deleteUserFromProject(userId, projectId){
     chrome.runtime.sendMessage({type: 'removeDocumentListField', opts: {collection: 'users', id: userId, field: 'project_ids', data: projectId}})
 }
 
-function createUserInProject(userId, projectId){
+export function createUserInProject(userId, projectId){
   // add user_id to project
   chrome.runtime.sendMessage({type: 'updateDocumentListField', opts: {collection: 'project', id: projectId, field: 'user_ids', data: userId}})
 
@@ -173,7 +119,7 @@ function createUserInProject(userId, projectId){
   chrome.runtime.sendMessage({type: 'updateDocumentListField', opts: {collection: 'users', id: userId, field: 'project_ids', data: projectId}})
 }
 
-function deleteGroupFromGroup(child_group_id, parent_group_id){
+export function deleteGroupFromGroup(child_group_id, parent_group_id){
     // delete child_group object itself
     chrome.runtime.sendMessage({type: 'deleteDocWithId', opts: {collection:'group', id: child_group_id}})
 
@@ -181,7 +127,7 @@ function deleteGroupFromGroup(child_group_id, parent_group_id){
     chrome.runtime.sendMessage({type: 'removeDocumentListField', opts: {collection: 'group', id: project_id, field: 'group_ids', data: parent_group_id}})
 }
 
-function deleteGroupFromProject(group_id, project_id){
+export function deleteGroupFromProject(group_id, project_id){
     // delete group object itself
     chrome.runtime.sendMessage({type: 'deleteDocWithId', opts: {collection:'group', id: group_id}})
 
@@ -189,7 +135,7 @@ function deleteGroupFromProject(group_id, project_id){
     chrome.runtime.sendMessage({type: 'removeDocumentListField', opts: {collection: 'project', id: project_id, field: 'group_ids', data: group_id}})
 }
 
-function deleteFileFromGroup(file_id, group_id){
+export function deleteFileFromGroup(file_id, group_id){
     // delete file object itself
     chrome.runtime.sendMessage({type: 'deleteDocWithId', opts: {collection:'file', id: file_id}})
 
