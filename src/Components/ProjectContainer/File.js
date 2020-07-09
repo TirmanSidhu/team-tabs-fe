@@ -1,9 +1,9 @@
 import React, {useState, useCallback} from 'react';
-import {Page, Card, Button, Link, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
+import {Page, Card, ActionList, Button, Popover, Link, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
 import {
     MobileVerticalDotsMajorMonotone,
-    ChevronDownMinor,
-    CustomerPlusMajorMonotone,
+    DeleteMinor,
+    EditMinor,
     MobileCancelMajorMonotone
   } from "@shopify/polaris-icons";
 import './ProjectContainer.css';
@@ -11,12 +11,44 @@ import './ProjectContainer.css';
 
 export default function Folder(props) {
 
+    const [popoverActive, setPopoverActive] = useState(false);
+    const togglePopoverActive = useCallback(
+        () => setPopoverActive((popoverActive) => !popoverActive),
+        [],
+      );
+
+    const activator = (
+        <Button
+            accessibilityLabel="Cancel"
+            icon={MobileVerticalDotsMajorMonotone}
+            plain
+            onClick={togglePopoverActive}
+        />
+    );
+
     return (
         <div className="file">
-            <div className="polaris-icon">
-                <Icon source={MobileVerticalDotsMajorMonotone} />
+            <div style={{padding: '0px'}}>
+                <Popover
+                    active={popoverActive}
+                    activator={activator}
+                    onClose={togglePopoverActive}
+                >
+                   <ActionList
+                        items= {[
+                            {content: 'Title', icon: EditMinor},
+                            {content: 'URL', icon: EditMinor},
+                            {
+                            destructive: true,
+                            content: 'Delete',
+                            icon: DeleteMinor,
+                            },
+                        ]}
+                    />
+                </Popover>
             </div>
-            <div >
+
+            <div className="file-link">
                 <Link url={props.link}>{props.title}</Link>
             </div>
         </div>

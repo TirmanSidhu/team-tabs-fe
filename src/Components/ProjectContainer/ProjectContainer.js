@@ -97,7 +97,7 @@ function ProjectContainer(props) {
                                     folder.children.map(item => {
                                         if(item.type === 'heading') {
                                             return (
-                                                <Folder title={folder.title}>
+                                                <Folder title={folder.title} lastLevel>
                                                     {
                                                         item.children.map(file => <File title={file.title} link="shopify.com"/>)
                                                     }
