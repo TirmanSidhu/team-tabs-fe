@@ -33,9 +33,9 @@ import * as helpers from '../../helpers.js';
             console.log(entry);
             chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
               if(response !== null) {
-                console.log("retrieved project");
-                console.log(JSON.parse(response));
-                currentProjectsArray.push(JSON.parse(response));
+                var responseWithID = JSON.parse(response);
+                responseWithID.id = entry;
+                currentProjectsArray.push(responseWithID);
               }
             });
           });
@@ -44,9 +44,9 @@ import * as helpers from '../../helpers.js';
             console.log(entry);
             chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
               if(response !== null) {
-                console.log("retrieved project");
-                console.log(JSON.parse(response));
-                allProjectsArray.push(JSON.parse(response));
+                var responseWithID = JSON.parse(response);
+                responseWithID.id = entry;
+                currentProjectsArray.push(responseWithID);
               }
             });
           });
@@ -156,7 +156,7 @@ function Projects(props) {
             })
         }, [])
 
-        
+
         console.log("rendering")
         const [allProjects, setAllProjects ] = useState({
             current: [],
