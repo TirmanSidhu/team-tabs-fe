@@ -1,5 +1,6 @@
-import React, {useState, useCallback} from 'react';
-import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible, Popover, TextField, FormLayout} from '@shopify/polaris';
+/*global chrome*/
+import React, {useEffect, useState, useCallback} from 'react';
+import {Page, Card, Button, Heading, Icon, Stack, TextStyle, Collapsible} from '@shopify/polaris';
 import {
     DropdownMinor,
     ChevronDownMinor,
@@ -10,20 +11,63 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Link } from "react-router-dom";
 import './Projects.css';
 import ProjectBrief from './ProjectBrief';
+import * as helpers from '../../helpers.js';
+
+
+    const getProjects = () => {
+      var user;
+      var currentProjects;
+      var allProjects;
+      var currentProjectsArray = [];
+      var allProjectsArray = [];
+
+    chrome.identity.getProfileUserInfo(function(userinfo){
+        chrome.runtime.sendMessage({type: 'queryCollectionWithWhere', opts: {collection: 'users', where: ['email', '==', userinfo.email]}}, function(response) {
+          if(response !== null) {
+            user = JSON.parse(response);
+          }
+
+          currentProjects = user.current_projects;
+          allProjects = user.all_projects;
+          currentProjects.forEach(function(entry) {
+            console.log(entry);
+            chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
+              if(response !== null) {
+                var responseWithID = JSON.parse(response);
+                responseWithID.id = entry;
+                currentProjectsArray.push(responseWithID);
+              }
+            });
+          });
+
+          allProjects.forEach(function(entry) {
+            console.log(entry);
+            chrome.runtime.sendMessage({ type: 'queryCollectionWithID', opts: { collection: 'project', id: entry } }, function (response) {
+              if(response !== null) {
+                var responseWithID = JSON.parse(response);
+                responseWithID.id = entry;
+                currentProjectsArray.push(responseWithID);
+              }
+            });
+          });
+        });
+      });
+      return [currentProjectsArray, allProjectsArray];
+    }
 
     const getItemStyle = (isDragging, draggableStyle) => ({
         // some basic styles to make the items look a bit nicer
         userSelect: "none",
-    
+
         // change background colour if dragging
         boxShadow: isDragging ? "0px 0px 4px 4px rgba(89,103,195,0.38)" : "",
         background: isDragging ? '#F4F6F8' : "",
         padding: 10,
-    
+
         // styles we need to apply on draggables
         ...draggableStyle
     });
-    
+
     const getListStyle = isDraggingOver => ({
         background: isDraggingOver ? "rgba(89, 103, 195, 0.1)" : "",
     });
@@ -58,14 +102,7 @@ function Projects(props) {
         const [all, setAll] = useState(true);
         const handleAllToggle = useCallback(() => setAll((all) => !all), []);
 
-        const [popoverActive, setPopoverActive] = useState(false);
-        const [linkValue, setLinkValue] = useState('');
-        const handleLinkChange = useCallback((value) => setLinkValue(value), []);
-        
-        const togglePopoverActive = useCallback(
-            () => setPopoverActive((popoverActive) => !popoverActive),
-            [],
-          );
+        const closeExtension = () => {}
 
         const id2List = {
             current: 'current',
@@ -73,7 +110,7 @@ function Projects(props) {
         };
 
         const getList = id => allProjects[id2List[id]];
-        
+
         const onDragEnd = result => {
             const { source, destination } = result;
 
@@ -110,107 +147,39 @@ function Projects(props) {
             }
         };
 
-    const [allProjects, setAllProjects ] = useState({
-            all: [
-            {
-                project_id: 'project_1',
-                project_name: 'Store Performance',
-                members: 12,
-                project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-            },
-            {
-                project_id: 'project_2',
-                project_name: 'Shop Lab',
-                members: 11,
-                project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-            }
-        ],
-        current: [
-            {
-                project_id: 'project_0',
-                project_name: 'Inventory States',
-                project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-                members: 13,
-            }
-        ]
-    })
-
-    const addCurrentProject = () => {
-        setAllProjects(prevState => {
-            return ({...prevState, 
-                current: [...prevState.current, 
-                    {
-                        project_id: 'project_4',
-                        project_name: 'Store Data',
-                        members: 5,
-                        project_description: `Making Shopify a reliable, up-to-date source of truth about the state of a business's inventory.`,
-                    }
-                ]
+        useEffect( () => {
+            var projects = getProjects();
+            console.log(projects);
+            setAllProjects({
+                current: projects[1],
+                all: projects[0]
             })
-        })
-        setLinkValue('');
-        togglePopoverActive();
-    }
+        }, [])
 
-    const joinProject = (<Button size="slim" onClick={setPopoverActive} primary>Join a project</Button>);
 
-    return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <div className="projects-heading">
-                <Heading>Projects</Heading>
-            </div>
-            <div className="project-space">
-                <Card>
-                    <div className="project-category">
-                        <TextStyle variation="strong">Current</TextStyle >
-                    </div>
-                    <Droppable droppableId="current">
-                        {(provided, snapshot) => (
-                            <div className="project-container" ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
-                                {allProjects.current.map((project, i) => (
-                                    <Draggable
-                                        key={project.project_id}
-                                        draggableId={project.project_id}
-                                        index={i}
-                                    >
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={getItemStyle(
-                                                    snapshot.isDragging,
-                                                    provided.draggableProps.style
-                                                )}>
-                                                   <ProjectBrief name={project.project_name} description={project.project_description} id={project.project_id} members={project.members} />
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </Card>
-                <Card>
-                    <div onClick={handleAllToggle} className="project-dropdown">
-                        <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
-                        <div className="polaris-icon" style={all ? {} : {transform: 'rotate(-180deg)'}}>
-                            <Icon source={DropdownMinor}/>
+        console.log("rendering")
+        const [allProjects, setAllProjects ] = useState({
+            current: [],
+            all: [],
+        });
+
+        return (
+            <DragDropContext onDragEnd={onDragEnd}>
+                <div className="projects-heading">
+                    <Heading>Projects</Heading>
+                </div>
+                <div className="project-space">
+                    <Card>
+                        <div className="project-category">
+                            <TextStyle variation="strong">Current</TextStyle >
                         </div>
-                    </div>
-                    <Collapsible
-                        open={all}
-                        id="basic-collapsible"
-                        transition={{duration: '150ms', timingFunction: 'ease'}}
-                    >
-                        <Droppable droppableId="all">
+                        <Droppable droppableId="current">
                             {(provided, snapshot) => (
                                 <div className="project-container" ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
-                                    {allProjects.all.map((project, i) => (
+                                    {allProjects.current.map((project, i) => (
                                         <Draggable
-                                            key={project.project_id}
-                                            draggableId={project.project_id}
+                                            key={project.id}
+                                            draggableId={project.id}
                                             index={i}
                                         >
                                             {(provided, snapshot) => (
@@ -221,9 +190,8 @@ function Projects(props) {
                                                     style={getItemStyle(
                                                         snapshot.isDragging,
                                                         provided.draggableProps.style
-                                                    )}
-                                                >
-                                                   <ProjectBrief name={project.project_name} description={project.project_description} teamId={project.project_id} members={project.members} />
+                                                    )}>
+                                                       <ProjectBrief name={project.project_name} description={project.description} id={project.id} members={project.user_ids.length} />
                                                 </div>
                                             )}
                                         </Draggable>
@@ -232,32 +200,57 @@ function Projects(props) {
                                 </div>
                             )}
                         </Droppable>
-                    </Collapsible>
-                </Card>
-            </div>
-            <div className="bottom-bar">
-                <Link to="/add-project" style={{ textDecoration: 'none' }}>
-                    <Button size="slim" primary>Make a project</Button>            
-                </Link>
-                <Popover
-                    active={popoverActive}
-                    activator={joinProject}
-                    onClose={togglePopoverActive}
-                    ariaHaspopup={false}
-                    sectioned
-                >
-                    <FormLayout>
-                    <TextField
-                        label="Project Link"
-                        value={linkValue}
-                        onChange={handleLinkChange}
-                    />
-                    <Button size="slim" onClick={addCurrentProject} >Add Heading</Button>
-                    </FormLayout>
-                </Popover>   
-            </div>
-        </DragDropContext>
-    );
+                    </Card>
+                    <Card>
+                        <div onClick={handleAllToggle} className="project-dropdown">
+                            <div className="polaris-icon" style={all ? {} : {transform: 'rotate(-180deg)'}}>
+                                <Icon source={DropdownMinor}/>
+                            </div>
+                            <TextStyle variation="strong">{`All (${allProjects.all.length})`}</TextStyle >
+                        </div>
+                        <Collapsible
+                            open={all}
+                            id="basic-collapsible"
+                            transition={{duration: '150ms', timingFunction: 'ease'}}
+                        >
+                            <Droppable droppableId="all">
+                                {(provided, snapshot) => (
+                                    <div className="project-container" ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
+                                        {allProjects.all.map((project, i) => (
+                                            <Draggable
+                                                key={project.id}
+                                                draggableId={project.id}
+                                                index={i}
+                                            >
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        style={getItemStyle(
+                                                            snapshot.isDragging,
+                                                            provided.draggableProps.style
+                                                        )}
+                                                    >
+                                                       <ProjectBrief name={project.project_name} description={project.description} teamId={project.id} members={project.members} />
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </Collapsible>
+                    </Card>
+                </div>
+                <div className="bottom-bar">
+                    <Link to="/add-project" style={{ textDecoration: 'none' }}>
+                        <Button size="slim" primary>Make a project</Button>
+                    </Link>
+                </div>
+            </DragDropContext>
+        );
 }
 
 export default Projects;

@@ -9,6 +9,7 @@ import {
   } from "@shopify/polaris-icons";
 import { Link } from "react-router-dom";
 import './AddProject.css';
+import * as Helpers from '../../helpers.js'
 
 function AddProject() {
 
@@ -18,6 +19,11 @@ function AddProject() {
       (value) => setname(value),
       [],
     );
+
+    const makeProject = () => {
+        Helpers.createProject(name, description, "open_folder", [], "")
+        // TODO: add join project call after
+    }
 
     const [description, setdescription] = useState('');
 
@@ -77,13 +83,13 @@ function AddProject() {
                             https://tabify.com/834638
                         </div>
                         <div>
-                            <Button size="slim" primary>Copy</Button> 
+                            <Button size="slim" primary>Copy</Button>
                         </div>
                     </div>
                 </Card>
             </div>
             <div className="bottom-bar">
-                <Button primary size="slim">Make Project</Button>            
+                <Button primary onClick={makeProject} size="slim">Make Project</Button>
             </div>
         </div>
     );
